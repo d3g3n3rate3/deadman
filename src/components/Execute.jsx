@@ -10,7 +10,7 @@ function Execute(props) {
   const [switchId, setSwitchId] = useState();
   const [fetchData, setFetchData] = useState([0, 0, 0, 0, 0, 0]);
   const [executed, setExecuted] = useState('');
-  const [switchList, setSwitchList] = useState([{ id: '', bounty: '', gasEstimate: '' }]);
+  const [switchList, setSwitchList] = useState([]);
 
   const provider = new ethers.providers.Web3Provider(window.ethereum);
   const signer = provider.getSigner();
@@ -25,7 +25,6 @@ function Execute(props) {
 
     let list = [];
     const switchCount = await contract.getSwitchCount();
-
     const gasPrice = await provider.getGasPrice();
 
     for (let id = 1; id <= switchCount; id++) {
@@ -108,7 +107,7 @@ function Execute(props) {
           <button onClick={getActiveSwitches}>Retrieve active switches</button>
         </p>
 
-        {switchList.map((x, i) => {
+        {switchList.length === 0 ? 'No executable switches found.' : switchList.map((x, i) => {
           return (
             <div className="box">
               Switch ID: {x.id}
