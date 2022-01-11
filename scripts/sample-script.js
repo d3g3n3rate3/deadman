@@ -15,11 +15,11 @@ async function main() {
   await switchfactory.deployed();
   console.log("Factory deployed to:", switchfactory.address);
 
-  const tx = await switchfactory.newSwitch([owner.address], [100], 10, 1000000, { value: 110 });
-  await tx.wait();
+  //const tx = await switchfactory.newSwitch([owner.address], [100], 10, 1000, { value: 110 });
+  //await tx.wait();
 
-  console.log("Factory deployed to:", switchfactory.address);
-  console.log(await switchfactory.getSwitch(1));
+  //console.log("Factory deployed to:", switchfactory.address);
+  //console.log(await switchfactory.getSwitch(1));
 }
 
 // We recommend this pattern to be able to use async/await everywhere

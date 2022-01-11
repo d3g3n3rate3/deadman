@@ -96,6 +96,9 @@ function Create(props) {
           <div class="col-lg-7">
             <button onClick={requestAccount}>Connect to Metamask</button>
             <br />
+            Network: Ropsten
+            Contract address: {switchAddres}
+            <br />
 
             {inputList.map((x, i) => {
               return (
