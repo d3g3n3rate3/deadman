@@ -5,19 +5,6 @@ import SwitchFactory from '../artifacts/contracts/SwitchFactory.sol/SwitchFactor
 import styles from '../mystyle.module.css';
 
 
-function timeConverter(UNIX_timestamp) {
-  var a = new Date(UNIX_timestamp * 1000);
-  var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  var year = a.getFullYear();
-  var month = months[a.getMonth()];
-  var date = a.getDate();
-  var hour = a.getHours();
-  var min = a.getMinutes();
-  var sec = a.getSeconds();
-  var time = date + ' ' + month + ' ' + year + ' ' + hour + ':' + min + ':' + sec;
-  return time;
-}
-
 function Execute(props) {
 
   const [switchId, setSwitchId] = useState();
@@ -29,9 +16,16 @@ function Execute(props) {
   const signer = provider.getSigner();
   const contract = new ethers.Contract(props.switchAddress, SwitchFactory.abi, signer);
 
+  async function requestAccount() {
+    await window.ethereum.request({ method: 'eth_requestAccounts' });
+  }
+
   async function getActiveSwitches() {
+    await requestAccount();
+
     let list = [];
     const switchCount = await contract.getSwitchCount();
+
     const gasPrice = await provider.getGasPrice();
 
     for (let id = 1; id <= switchCount; id++) {
@@ -51,7 +45,7 @@ function Execute(props) {
       if (open) {
         estimate = await contract.estimateGas.executeSwitch(id);
         console.log(gasPrice.toString())
-        list = [...list, { id: id, bounty: data[2].toString(), gasEstimate: estimate.toString() }]
+        list = [...list, { id: id, bounty: ethers.utils.formatEther(data[2]).toString(), gasEstimate: estimate.toString() }]
       }
     }
 
@@ -117,10 +111,9 @@ function Execute(props) {
         {switchList.map((x, i) => {
           return (
             <div className="box">
-
               Switch ID: {x.id}
               <br />
-              Bounty: {ethers.utils.formatEther(x.bounty)} ETH
+              Bounty: {x.bounty} ETH
               <br />
               Gas estimate: {x.gasEstimate}
               <br /> <br />
