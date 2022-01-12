@@ -10,7 +10,7 @@ function Execute(props) {
   const [switchId, setSwitchId] = useState();
   const [fetchData, setFetchData] = useState([0, 0, 0, 0, 0, 0]);
   const [executed, setExecuted] = useState('');
-  const [switchList, setSwitchList] = useState([]);
+  const [switchList, setSwitchList] = useState([{ id: '', bounty: '', gasEstimate: '' }]);
 
   const provider = new ethers.providers.Web3Provider(window.ethereum);
   const signer = provider.getSigner();
@@ -103,7 +103,7 @@ function Execute(props) {
         <p>
           This is a list of switches that have matured and are open to execution.
           Bounty should exceed execution gas costs, but please double-check.
-
+          <br />
           <button onClick={getActiveSwitches}>Retrieve active switches</button>
         </p>
 

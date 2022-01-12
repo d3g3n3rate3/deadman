@@ -10,8 +10,9 @@ contract SwitchFactory is ISwitchFactory {
 
     enum STATUS {
         OPEN,
-        CLOSED,
-        EXECUTED
+        PAUSED,
+        EXECUTED,
+        WITHDRAWN
     }
 
     struct DeadManSwitch {
@@ -82,9 +83,33 @@ contract SwitchFactory is ISwitchFactory {
         return _switchId.current();
     }
 
-    function cancelSwitch(uint256 _id) external override onlySwitchOwner(_id) {
-        _idToSwitch[_id].status = STATUS.CLOSED;
-        emit SwitchCancelled(_id);
+    function cancelSwitch(uint256 _id, bool withdraw)
+        external
+        override
+        onlySwitchOwner(_id)
+    {
+        require(
+            _idToSwitch[_id].status == STATUS.OPEN ||
+                _idToSwitch[_id].status == STATUS.PAUSED,
+            "Cannot cancel executed or withdrawn contract"
+        );
+        _idToSwitch[_id].status = STATUS.PAUSED;
+
+        if (withdraw) {
+            _idToSwitch[_id].status = STATUS.WITHDRAWN;
+            uint256 total_amount;
+            for (uint256 i = 0; i < _idToSwitch[_id].amounts.length; i++) {
+                total_amount += _idToSwitch[_id].amounts[i];
+            }
+            total_amount += _idToSwitch[_id].bounty;
+
+            (bool success, ) = _idToSwitch[_id].owner.call{value: total_amount}(
+                ""
+            );
+            require(success, "Withdrawal failed");
+        }
+
+        emit SwitchCanceled(_id);
     }
 
     function executeSwitch(uint256 _id) external override {
@@ -121,7 +146,7 @@ contract SwitchFactory is ISwitchFactory {
     {
         require(
             _idToSwitch[_id].status == STATUS.OPEN,
-            "Cannot extend a closed or executed switch"
+            "Cannot extend a paused or executed switch"
         );
         _idToSwitch[_id].executionTime = block.timestamp + _newDelay;
         emit SwitchExtended(_id, block.timestamp + _newDelay);
@@ -133,8 +158,8 @@ contract SwitchFactory is ISwitchFactory {
         onlySwitchOwner(_id)
     {
         require(
-            _idToSwitch[_id].status == STATUS.CLOSED,
-            "Cannot reopen an open or executed switch"
+            _idToSwitch[_id].status == STATUS.PAUSED,
+            "Cannot reopen an open, executed or withdrawn switch"
         );
         _idToSwitch[_id].executionTime = block.timestamp + _newDelay;
         _idToSwitch[_id].status = STATUS.OPEN;
@@ -159,8 +184,11 @@ contract SwitchFactory is ISwitchFactory {
             uint256[] memory
         )
     {
+        require(_id <= _switchId.current(), "ID does not exist yet");
+
         address payable[] memory recipients = _idToSwitch[_id].recipients;
         uint256[] memory amounts = _idToSwitch[_id].amounts;
+
         return (
             uint256(_idToSwitch[_id].status),
             _idToSwitch[_id].owner,

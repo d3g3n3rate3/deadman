@@ -11,7 +11,7 @@ import {
   Execute,
 } from "./components";
 
-const switchAddress = '0x6153d842b1ADD70d721d19Ab7b5853501a062b1C';
+const switchAddress = '0xaB79aC5B7ACa53B9d78A26D0594f2aa859b509E8';
 
 ReactDOM.render(
   <Router>

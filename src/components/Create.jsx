@@ -89,6 +89,10 @@ function Create(props) {
     setInputList([...inputList, { recipient: "", amount: "" }]);
   };
 
+  function Hello(props) {
+    return (<div>Hello</div>)
+  }
+
   return (
     <div className="home">
       <div class="container">
@@ -98,6 +102,7 @@ function Create(props) {
             <br />
             Network: Ropsten
             <br />
+            <Hello />
 
             {inputList.map((x, i) => {
               return (
@@ -147,12 +152,16 @@ function Create(props) {
             {submitted}
           </div>
           <div class="col-lg-5">
-            <h1 class="font-weight-light">Home page</h1>
+            <h1 class="font-weight-light">Create a new Deadman switch</h1>
             <p>
-              Lorem Ipsum is simply dummy text of the printing and typesetting
-              industry. Lorem Ipsum has been the industry's standard dummy text
-              ever since the 1500s, when an unknown printer took a galley of
-              type and scrambled it to make a type specimen book.
+              Deadman is a simple dead man's switch dapp that allows you to
+              send ETH to a list of beneficiaries after a set delay has passed.
+              To create a new switch, specify the addresses and amounts, and set
+              the delay and bounty. The bounty is used to reward other users for
+              executing your switch after the delay has passed. It should be set
+              so that it covers gas costs and a small reward on top. You can view
+              any switch using its ID on the View tab, or execute matured switch in
+              the Execute tab.
             </p>
           </div>
         </div>

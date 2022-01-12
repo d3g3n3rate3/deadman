@@ -7,7 +7,7 @@ interface ISwitchFactory {
         uint256 bounty,
         uint256 executionTime
     );
-    event SwitchCancelled(uint256 switchId);
+    event SwitchCanceled(uint256 switchId);
     event SwitchExtended(uint256 switchId, uint256 newExecutionTime);
     event SwitchExecuted(uint256 switchId, address executor, uint256 bounty);
 
@@ -18,7 +18,7 @@ interface ISwitchFactory {
         uint256 _delay
     ) external payable returns (uint256);
 
-    function cancelSwitch(uint256 _id) external;
+    function cancelSwitch(uint256 _id, bool withdraw) external;
 
     function executeSwitch(uint256 _id) external;
 

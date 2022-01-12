@@ -137,8 +137,8 @@ describe("SwitchFactory", function () {
       expect(switchfactory.executeSwitch(1)).to.be.reverted;
     });
 
-    it("Should not allow a cancelled switch to be executed", async function () {
-      await switchfactory.cancelSwitch(1);
+    it("Should not allow a canceled switch to be executed", async function () {
+      await switchfactory.cancelSwitch(1, false);
 
       // then increase time
       await network.provider.send("evm_increaseTime", [3600]);
@@ -147,8 +147,8 @@ describe("SwitchFactory", function () {
       expect(switchfactory.executeSwitch(1)).to.be.reverted;
     });
 
-    it("Should allow a cancelled switch to be reactivated", async function () {
-      await switchfactory.cancelSwitch(1);
+    it("Should allow a canceled switch to be reactivated", async function () {
+      await switchfactory.cancelSwitch(1, false);
       await switchfactory.reopenSwitch(1, 1000);
 
       // then increase time
@@ -174,15 +174,20 @@ describe("SwitchFactory", function () {
       await network.provider.send("evm_mine");
 
       await switchfactory.executeSwitch(1);
-      expect(switchfactory.cancelSwitch(1, 1000)).to.be.reverted;
+      expect(switchfactory.cancelSwitch(1, false)).to.be.reverted;
     });
 
     it("Should only allow the owner to close and reopen switches", async function () {
-      expect(switchfactory.connect(addr1).cancelSwitch(1)).to.be.reverted;
-      await switchfactory.cancelSwitch(1);
+      expect(switchfactory.connect(addr1).cancelSwitch(1, false)).to.be.reverted;
+      await switchfactory.cancelSwitch(1, false);
 
       expect(switchfactory.connect(addr1).reopenSwitch(1, 1000)).to.be.reverted;
       await switchfactory.reopenSwitch(1, 1000);
+    });
+
+    it("Should allow owner to cancel and withdraw an open contract", async function () {
+      await switchfactory.cancelSwitch(1, true);
+      expect(await switchfactory.provider.getBalance(switchfactory.address)).to.equal(0);
     });
   });
 });
